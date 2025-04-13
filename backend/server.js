@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../frontend/public')));
@@ -17,6 +17,13 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../frontend/views'));
 
 const workoutsFilePath = path.join(__dirname, 'data', 'workouts.json');
+
+// Initialize workouts data if file doesn't exist
+try {
+    JSON.parse(readFileSync(workoutsFilePath, 'utf8'));
+} catch (error) {
+    writeFileSync(workoutsFilePath, JSON.stringify({}, null, 2), 'utf8');
+}
 
 // Load workouts data
 let workouts = JSON.parse(readFileSync(workoutsFilePath, 'utf8'));
