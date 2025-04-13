@@ -1,0 +1,9 @@
+{
+  "name": "workout-tracker-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for the workout tracker application",
+  "private": true,
+  "dependencies": {
+    "ejs": "^3.1.9"
+  }
+} 

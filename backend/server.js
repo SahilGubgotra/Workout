@@ -12,8 +12,9 @@ const app = express();
 const PORT = 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../frontend/public')));
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '../frontend/views'));
 
 const workoutsFilePath = path.join(__dirname, 'data', 'workouts.json');
 
@@ -54,4 +55,4 @@ app.post('/save-day', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
-});
+}); 
