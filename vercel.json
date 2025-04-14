@@ -27,8 +27,8 @@
   },
   "functions": {
     "backend/server.js": {
-      "memory": 1024,
-      "maxDuration": 10
+      "memory": 3008,
+      "maxDuration": 60
     }
   },
   "regions": ["bom1"]

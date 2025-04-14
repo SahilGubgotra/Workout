@@ -25,26 +25,49 @@ const mongoOptions = {
     socketTimeoutMS: 45000,
 };
 
-let cachedDb = null;
+// MongoDB connection promise
+let mongoPromise = null;
 
 // MongoDB connection function
 const connectDB = async () => {
-    if (cachedDb && mongoose.connections[0].readyState) {
-        console.log('Using cached database connection');
-        return;
-    }
-
     try {
+        // If we already have a connection promise, return it
+        if (mongoPromise) {
+            return mongoPromise;
+        }
+
+        // If mongoose is already connected, return the connection
+        if (mongoose.connection.readyState === 1) {
+            return mongoose.connection;
+        }
+
         if (!process.env.MONGODB_URI) {
             throw new Error('MONGODB_URI environment variable is not set');
         }
 
-        const conn = await mongoose.connect(process.env.MONGODB_URI, mongoOptions);
-        cachedDb = conn;
+        // Create a new connection promise
+        mongoPromise = mongoose.connect(process.env.MONGODB_URI, mongoOptions);
+        
+        // Wait for the connection
+        await mongoPromise;
         console.log('MongoDB connected successfully');
+        
+        // Handle connection errors
+        mongoose.connection.on('error', (err) => {
+            console.error('MongoDB connection error:', err);
+            mongoPromise = null;
+        });
+
+        mongoose.connection.on('disconnected', () => {
+            console.log('MongoDB disconnected');
+            mongoPromise = null;
+        });
+
+        return mongoPromise;
     } catch (error) {
-        console.error('MongoDB connection error:', error.message);
-        throw error; // Let the error be caught by the route handler
+        console.error('MongoDB connection error:', error);
+        mongoPromise = null;
+        throw new Error('Failed to connect to database');
     }
 };
 
@@ -55,8 +78,19 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../frontend/views'));
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'ok' });
+app.get('/health', async (req, res) => {
+    try {
+        await connectDB();
+        res.status(200).json({ 
+            status: 'ok',
+            mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            status: 'error',
+            message: error.message
+        });
+    }
 });
 
 // Route for the home page
@@ -84,8 +118,7 @@ app.get('/:day', async (req, res) => {
         res.render('day', { day, data: workout });
     } catch (error) {
         console.error('Error fetching workout:', error);
-        // Clear cached connection on error
-        cachedDb = null;
+        mongoPromise = null;
         res.status(500).render('error', {
             message: 'Unable to load workout data. Please try again later.',
             error: process.env.NODE_ENV === 'development' ? error : {}
@@ -126,8 +159,7 @@ app.post('/save-day', async (req, res) => {
         res.redirect(`/${day}`);
     } catch (error) {
         console.error('Error saving workout:', error);
-        // Clear cached connection on error
-        cachedDb = null;
+        mongoPromise = null;
         res.status(500).render('error', {
             message: 'Error saving workout. Please try again.',
             error: process.env.NODE_ENV === 'development' ? error : {}
@@ -146,8 +178,7 @@ app.use((req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Application error:', err);
-    // Clear cached connection on error
-    cachedDb = null;
+    mongoPromise = null;
     res.status(500).render('error', {
         message: 'Something went wrong! Please try again.',
         error: process.env.NODE_ENV === 'development' ? err : {}
