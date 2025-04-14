@@ -11,12 +11,15 @@
   ],
   "routes": [
     {
-      "src": "/(.+\\.(?:json|css|js|jpg|png|gif|ico))$",
+      "src": "/(.+\\.(json|css|js|jpg|png|gif|ico))$",
       "dest": "/frontend/public/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/backend/server.js"
+      "dest": "/backend/server.js",
+      "headers": {
+        "cache-control": "s-maxage=0"
+      }
     }
   ],
   "env": {
@@ -27,5 +30,6 @@
       "memory": 1024,
       "maxDuration": 10
     }
-  }
+  },
+  "regions": ["bom1"]
 } 
