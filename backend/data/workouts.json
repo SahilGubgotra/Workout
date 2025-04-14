@@ -1,10 +1,18 @@
 {
   "monday": {
     "rest": true,
-    "exercises": []
+    "exercises": [
+      "Lats "
+    ]
   },
   "tuesday": {
     "rest": true,
     "exercises": []
+  },
+  "wednesday": {
+    "rest": false,
+    "exercises": [
+      "sfdg"
+    ]
   }
 }

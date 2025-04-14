@@ -1,8 +1,13 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import Workout from './models/Workout.js';
+
+// Load environment variables
+dotenv.config();
 
 // Setting up __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -11,22 +16,20 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('Connected to MongoDB');
+}).catch((error) => {
+    console.error('MongoDB connection error:', error);
+});
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../frontend/views'));
-
-const workoutsFilePath = path.join(__dirname, 'data', 'workouts.json');
-
-// Initialize workouts data if file doesn't exist
-try {
-    JSON.parse(readFileSync(workoutsFilePath, 'utf8'));
-} catch (error) {
-    writeFileSync(workoutsFilePath, JSON.stringify({}, null, 2), 'utf8');
-}
-
-// Load workouts data
-let workouts = JSON.parse(readFileSync(workoutsFilePath, 'utf8'));
 
 // Route for the home page
 app.get('/', (req, res) => {
@@ -34,30 +37,52 @@ app.get('/', (req, res) => {
 });
 
 // Route for each day's page
-app.get('/:day', (req, res) => {
+app.get('/:day', async (req, res) => {
     const day = req.params.day.toLowerCase();
     const validDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    
     if (validDays.includes(day)) {
-        res.render('day', { day: day, data: workouts[day] || { rest: false, exercises: [] } });
+        try {
+            let workout = await Workout.findOne({ day });
+            if (!workout) {
+                workout = { rest: false, exercises: [] };
+            }
+            res.render('day', { day, data: workout });
+        } catch (error) {
+            console.error('Error fetching workout:', error);
+            res.status(500).send('Server error');
+        }
     } else {
         res.status(404).send('Day not found');
     }
 });
 
 // Route to handle form submission
-app.post('/save-day', (req, res) => {
+app.post('/save-day', async (req, res) => {
     const { day, rest, exercise } = req.body;
-    if (rest === 'true') {
-        workouts[day] = { rest: true, exercises: [] };
-    } else {
-        if (!workouts[day]) {
-            workouts[day] = { rest: false, exercises: [] };
+    
+    try {
+        if (rest === 'true') {
+            await Workout.findOneAndUpdate(
+                { day },
+                { rest: true, exercises: [] },
+                { upsert: true, new: true }
+            );
+        } else {
+            await Workout.findOneAndUpdate(
+                { day },
+                { 
+                    rest: false,
+                    $push: { exercises: exercise }
+                },
+                { upsert: true, new: true }
+            );
         }
-        workouts[day].exercises.push(exercise);
+        res.redirect(`/${day}`);
+    } catch (error) {
+        console.error('Error saving workout:', error);
+        res.status(500).send('Error saving workout');
     }
-
-    writeFileSync(workoutsFilePath, JSON.stringify(workouts, null, 2), 'utf8');
-    res.redirect(`/${day}`);
 });
 
 app.listen(PORT, () => {
