@@ -1,7 +1,7 @@
 # Netlify configuration file
 
 [build]
-  base = "frontend"
+  base = "frontend/frontend"
   publish = "public"
   command = "npm install"
 
