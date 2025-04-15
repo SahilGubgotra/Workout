@@ -1,8 +1,9 @@
 # Netlify configuration file
 
 [build]
-  command = "cd /opt/build/repo/frontend && npm install"
-  publish = "/opt/build/repo/frontend/public"
+  base = "frontend"
+  command = "npm install"
+  publish = "public/"
 
 [functions]
   external_node_modules = ["express", "mongoose"]
