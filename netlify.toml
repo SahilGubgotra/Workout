@@ -1,12 +1,8 @@
 # Netlify configuration file
 
 [build]
-  # Set base directory to the frontend folder only
-  base = "frontend"
-  command = "npm install"
-  # Publish directory relative to base
-  publish = "./public"
-  functions = "../netlify/functions"
+  command = "cd frontend && npm install"
+  publish = "frontend/public"
 
 [functions]
   external_node_modules = ["express", "mongoose"]
