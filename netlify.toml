@@ -1,7 +1,11 @@
+# Netlify configuration file
+
 [build]
+  # Set base directory to the frontend folder only
   base = "frontend"
   command = "npm install"
-  publish = "public"
+  # Publish directory relative to base
+  publish = "./public"
   functions = "../netlify/functions"
 
 [functions]
