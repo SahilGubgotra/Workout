@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js",
-    "build": "npm install"
+    "build": "npm install && cp -r frontend/public/* public/"
   },
   "dependencies": {
     "express": "^4.19.2",
