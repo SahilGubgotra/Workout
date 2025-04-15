@@ -3,7 +3,8 @@
 [build]
   base = "frontend"
   command = "npm install"
-  publish = "public/"
+  publish = "frontend/public/"
+  functions = "frontend/netlify/functions"
 
 [functions]
   external_node_modules = ["express", "mongoose"]
