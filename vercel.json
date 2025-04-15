@@ -5,9 +5,7 @@
       "src": "backend/server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": [
-          "backend/**"
-        ]
+        "includeFiles": ["package.json", "backend/**"]
       }
     }
   ],

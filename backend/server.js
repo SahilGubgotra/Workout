@@ -2,21 +2,15 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import mongoose from 'mongoose';
+import * as mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 // Setting up __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load environment variables from backend/.env
-dotenv.config({ path: path.join(__dirname, '.env') });
-
-// Verify environment variables are loaded
-if (!process.env.MONGODB_URI) {
-    console.error('Environment variables not loaded! Check if .env file exists in backend directory');
-    throw new Error('Please define the MONGODB_URI environment variable');
-}
+// Load environment variables
+dotenv.config();
 
 // Create Express app
 const app = express();
@@ -48,15 +42,18 @@ const workoutSchema = new mongoose.Schema({
 const Workout = mongoose.model('Workout', workoutSchema);
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-.then(() => console.log('MongoDB Connected'))
-.catch(err => {
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Sahil:Sahilhero@cluster0.wt6euol.mongodb.net/workout-tracker?retryWrites=true&w=majority';
+
+try {
+    await mongoose.connect(MONGODB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
+    console.log('MongoDB Connected');
+} catch (err) {
     console.error('MongoDB connection error:', err);
     process.exit(1);
-});
+}
 
 // Routes
 app.get('/', (req, res) => {
