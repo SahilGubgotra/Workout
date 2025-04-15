@@ -6,6 +6,10 @@
   publish = "frontend/public/"
   functions = "frontend/netlify/functions"
 
+[build.environment]
+  NODE_VERSION = "18.17.0"
+  NPM_VERSION = "9.6.7"
+
 [functions]
   external_node_modules = ["express", "mongoose"]
   node_bundler = "esbuild"
