@@ -3,7 +3,7 @@
 [build]
   base = "frontend"
   publish = "public"
-  command = "npm install"
+  command = "cp -r public/* ."
 
 [functions]
   directory = "netlify/functions"
