@@ -5,7 +5,11 @@
       "src": "backend/server.js",
       "use": "@vercel/node",
       "config": {
-        "maxLambdaSize": "50mb"
+        "maxLambdaSize": "50mb",
+        "includeFiles": [
+          "backend/**",
+          "frontend/**"
+        ]
       }
     }
   ],
@@ -16,10 +20,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/backend/server.js",
-      "headers": {
-        "cache-control": "s-maxage=0"
-      }
+      "dest": "/backend/server.js"
     }
   ],
   "env": {
