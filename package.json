@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js",
-    "vercel-build": "npm install"
+    "vercel-build": "cp package.json backend/ && cd backend && npm install"
   },
   "dependencies": {
     "express": "^4.18.2",

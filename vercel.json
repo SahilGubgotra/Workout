@@ -3,14 +3,7 @@
   "builds": [
     {
       "src": "backend/server.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "package.json",
-          "backend/**",
-          "frontend/**"
-        ]
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -19,5 +12,7 @@
       "dest": "backend/server.js"
     }
   ],
-  "installCommand": "npm install"
+  "env": {
+    "MONGODB_URI": "@mongodb_uri"
+  }
 } 

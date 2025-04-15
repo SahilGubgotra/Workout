@@ -5,12 +5,18 @@ import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
-// Load environment variables
-dotenv.config();
-
 // Setting up __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Load environment variables from backend/.env
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+// Verify environment variables are loaded
+if (!process.env.MONGODB_URI) {
+    console.error('Environment variables not loaded! Check if .env file exists in backend directory');
+    throw new Error('Please define the MONGODB_URI environment variable');
+}
 
 // Create Express app
 const app = express();
@@ -42,23 +48,15 @@ const workoutSchema = new mongoose.Schema({
 const Workout = mongoose.model('Workout', workoutSchema);
 
 // MongoDB connection
-const connectDB = async () => {
-    if (!process.env.MONGODB_URI) {
-        throw new Error('Please define the MONGODB_URI environment variable');
-    }
-    
-    try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
-        console.log('MongoDB Connected');
-        return conn;
-    } catch (error) {
-        console.error('MongoDB connection error:', error);
-        throw error;
-    }
-};
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log('MongoDB Connected'))
+.catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+});
 
 // Routes
 app.get('/', (req, res) => {
@@ -74,7 +72,6 @@ app.get('/:day', async (req, res) => {
     }
 
     try {
-        await connectDB();
         const workout = await Workout.findOne({ day }) || { rest: false, exercises: [] };
         res.render('day', { day, data: workout });
     } catch (error) {
@@ -91,8 +88,6 @@ app.post('/save-day', async (req, res) => {
     }
 
     try {
-        await connectDB();
-        
         if (rest === 'true') {
             await Workout.findOneAndUpdate(
                 { day },
