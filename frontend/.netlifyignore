@@ -1,0 +1,13 @@
+# Ignore everything
+*
+
+# But include the public directory
+!public/
+!public/*
+!public/**/*
+
+# Explicitly ignore these files even if they're in public
+public/netlify.toml
+public/*.json
+public/*.js.map
+public/*.css.map 
