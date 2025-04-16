@@ -1,0 +1,26 @@
+services:
+  # Frontend static site
+  - type: web
+    name: workout-tracker-frontend
+    env: static
+    buildCommand: cd frontend && npm install
+    staticPublishPath: ./frontend/public
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+
+  # Backend API service
+  - type: web
+    name: workout-tracker-api
+    env: node
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node app.js
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+      - key: MONGODB_URI
+        sync: false # This will be set in Render dashboard 
