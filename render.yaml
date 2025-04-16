@@ -3,7 +3,7 @@ services:
   - type: web
     name: workout-tracker-frontend
     env: static
-    buildCommand: cd frontend && npm install
+    buildCommand: cd frontend && npm install && cp -r views/* public/
     staticPublishPath: ./frontend/public
     routes:
       - type: rewrite
@@ -18,7 +18,7 @@ services:
     name: workout-tracker-api
     env: node
     buildCommand: cd backend && npm install
-    startCommand: cd backend && node app.js
+    startCommand: cd backend && node server.js
     envVars:
       - key: NODE_VERSION
         value: 18.17.0

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node app.js",
-    "build": "echo 'No build step required - static files'"
+    "build": "cp -r views/* public/"
   },
   "dependencies": {
     "ejs": "^3.1.9",
