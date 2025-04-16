@@ -3,60 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workout Tracker</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        body {
-            background-color: #1a1a1a;
-            color: #ffffff;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            text-align: center;
-            color: #ffffff;
-        }
-        .days-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            padding: 1rem;
-        }
-        .day-link {
-            display: block;
-            padding: 2rem;
-            background-color: #2a2a2a;
-            color: #ffffff;
-            text-decoration: none;
-            text-align: center;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-            border: 1px solid #3a3a3a;
-        }
-        .day-link:hover {
-            transform: translateY(-5px);
-            background-color: #3a3a3a;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-    </style>
+    <title>Choose a Day</title>
+    <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Workout Tracker</h1>
-        <div class="days-container">
-            <a href="#" class="day-link">Monday</a>
-            <a href="#" class="day-link">Tuesday</a>
-            <a href="#" class="day-link">Wednesday</a>
-            <a href="#" class="day-link">Thursday</a>
-            <a href="#" class="day-link">Friday</a>
-            <a href="#" class="day-link">Saturday</a>
-            <a href="#" class="day-link">Sunday</a>
+        <h1>Choose a day</h1>
+        <div class="days-grid">
+            <form action="/monday" method="get">
+                <button type="submit">Monday</button>
+            </form>
+            <form action="/tuesday" method="get">
+                <button type="submit">Tuesday</button>
+            </form>
+            <form action="/wednesday" method="get">
+                <button type="submit">Wednesday</button>
+            </form>
+            <form action="/thursday" method="get">
+                <button type="submit">Thursday</button>
+            </form>
+            <form action="/friday" method="get">
+                <button type="submit">Friday</button>
+            </form>
+            <form action="/saturday" method="get">
+                <button type="submit">Saturday</button>
+            </form>
+            <div class="full-row">
+                <form action="/sunday" method="get">
+                    <button type="submit">Sunday</button>
+                </form>
+            </div>
         </div>
     </div>
     <script src="app.js"></script>
