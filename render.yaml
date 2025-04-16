@@ -22,5 +22,9 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 18.17.0
+      - key: PORT
+        value: 10000
       - key: MONGODB_URI
-        sync: false # This will be set in Render dashboard 
+        sync: false
+    healthCheckPath: /health
+    port: 10000 
