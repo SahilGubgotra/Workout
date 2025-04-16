@@ -1,5 +1,4 @@
 /* Reset some default browser styles */
-/* Reset some default browser styles */
 * {
     margin: 0;
     padding: 0;
@@ -8,7 +7,7 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: url('../background.jpg') no-repeat center center fixed;
+    background: url('background.jpg') no-repeat center center fixed;
     background-size: cover;
     display: flex;
     flex-direction: column;
@@ -40,6 +39,7 @@ h1 {
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 30px;
     width: 100%;
+    padding: 20px;
 }
 
 .days-grid .full-row {
@@ -56,13 +56,14 @@ button {
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
     width: 100%;
     max-width: 200px;
 }
 
 button:hover {
     background-color: rgba(0, 123, 255, 1);
+    transform: translateY(-2px);
 }
 
 @media (max-width: 600px) {
