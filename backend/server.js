@@ -14,8 +14,10 @@ dotenv.config();
 
 // Create Express app
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Basic middleware
+// Middleware
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 app.set('view engine', 'ejs');
@@ -41,23 +43,41 @@ const workoutSchema = new mongoose.Schema({
 // Create Workout model
 const Workout = mongoose.model('Workout', workoutSchema);
 
-// MongoDB connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Sahil:Sahilhero@cluster0.wt6euol.mongodb.net/workout-tracker?retryWrites=true&w=majority';
+// MongoDB Connection with retry logic
+const connectWithRetry = async () => {
+    try {
+        await mongoose.connect(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            // Retry options
+            serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+            socketTimeoutMS: 45000, // Close sockets after 45s
+        });
+        console.log('Successfully connected to MongoDB.');
+    } catch (err) {
+        console.error('MongoDB connection error:', err);
+        console.log('Retrying connection in 5 seconds...');
+        setTimeout(connectWithRetry, 5000);
+    }
+};
 
-try {
-    await mongoose.connect(MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    });
-    console.log('MongoDB Connected');
-} catch (err) {
+// Initial connection
+connectWithRetry();
+
+// Handle MongoDB connection errors
+mongoose.connection.on('error', (err) => {
     console.error('MongoDB connection error:', err);
-    process.exit(1);
-}
+    setTimeout(connectWithRetry, 5000);
+});
+
+mongoose.connection.on('disconnected', () => {
+    console.log('MongoDB disconnected. Attempting to reconnect...');
+    setTimeout(connectWithRetry, 5000);
+});
 
 // Routes
 app.get('/', (req, res) => {
-    res.render('index');
+    res.send('Workout Tracker API is running');
 });
 
 app.get('/:day', async (req, res) => {
@@ -108,9 +128,16 @@ app.post('/save-day', async (req, res) => {
     }
 });
 
-// Error handler
+// Start server only after MongoDB connects
+mongoose.connection.once('open', () => {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+});
+
+// Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err);
+    console.error(err.stack);
     res.status(500).send('Something broke!');
 });
 
